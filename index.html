@@ -44,6 +44,7 @@ input {
 .player iframe {
   width: 100%;
   height: 80%;
+  border: none;
 }
 
 .close {
@@ -87,6 +88,7 @@ input {
   margin: 3px;
   text-decoration: none;
   color: white;
+  cursor: pointer;
 }
 
 .play { background: green; }
@@ -105,7 +107,7 @@ input {
 <!-- PLAYER -->
 <div class="player" id="player">
   <div class="close" onclick="fecharPlayer()">FECHAR</div>
-  <iframe id="videoFrame" src="" frameborder="0" allowfullscreen></iframe>
+  <iframe id="videoFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- FILMES -->
@@ -125,7 +127,6 @@ const filmes = [
   }
 ];
 
-// CRIAR CARD
 function criarCard(f) {
   return `
   <div class="card">
@@ -143,15 +144,14 @@ function criarCard(f) {
   `;
 }
 
-// RENDER
 function render(lista = filmes) {
   document.getElementById("filmes").innerHTML =
     lista.map(criarCard).join("");
 }
 
-// PLAYER
 function abrirPlayer(link) {
-  document.getElementById("videoFrame").src = link;
+  const frame = document.getElementById("videoFrame");
+  frame.src = link;
   document.getElementById("player").style.display = "flex";
 }
 
@@ -160,7 +160,6 @@ function fecharPlayer() {
   document.getElementById("videoFrame").src = "";
 }
 
-// BUSCA
 document.getElementById("search").addEventListener("input", function() {
   let valor = this.value.toLowerCase();
 
