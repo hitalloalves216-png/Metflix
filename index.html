@@ -13,6 +13,7 @@ body {
   color: white;
 }
 
+/* HEADER */
 header {
   display: flex;
   justify-content: space-between;
@@ -26,6 +27,7 @@ input {
   padding: 8px;
   border-radius: 5px;
   border: none;
+  outline: none;
 }
 
 /* PLAYER / DETALHES */
@@ -58,6 +60,7 @@ input {
   backdrop-filter: brightness(0.6);
 }
 
+/* TOPO */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -70,9 +73,18 @@ input {
   cursor: pointer;
 }
 
-.player iframe {
+/* VÍDEO ORGANIZADO */
+.video-area {
   flex: 1;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.player iframe {
+  width: 90%;
+  height: 60vh;
+  border-radius: 12px;
   border: none;
 }
 
@@ -85,6 +97,7 @@ input {
   text-decoration: none;
   color: white;
   cursor: pointer;
+  border-radius: 6px;
 }
 
 .assistir {
@@ -105,7 +118,17 @@ input {
   gap: 10px;
 }
 
-/* CARD NOVO */
+/* SCROLL BONITO */
+.row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.row::-webkit-scrollbar-thumb {
+  background: #e50914;
+  border-radius: 10px;
+}
+
+/* CARD */
 .card {
   min-width: 170px;
   background: #1c1c1c;
@@ -114,6 +137,7 @@ input {
   transition: transform 0.3s;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .card:hover {
@@ -141,6 +165,7 @@ input {
   height: 50px;
   overflow: hidden;
 }
+
 </style>
 </head>
 
@@ -156,22 +181,25 @@ input {
   <div class="bg-blur" id="bgBlur"></div>
 
   <div class="player-content">
+
     <div class="topbar">
       <span id="tituloFilme"></span>
       <div class="fechar" onclick="fecharPlayer()">✕</div>
     </div>
 
-    <iframe id="videoFrame" allowfullscreen></iframe>
+    <div class="video-area">
+      <iframe id="videoFrame" allowfullscreen></iframe>
+    </div>
 
     <div style="text-align:center; padding:10px;">
       <a id="raveBtn" class="btn rave" target="_blank">📲 Assistir no Rave</a>
     </div>
+
   </div>
 </div>
 
 <!-- DETALHES -->
 <div class="player" id="detalhes">
-
   <div class="bg-blur" id="bgDetalhes"></div>
 
   <div class="player-content">
