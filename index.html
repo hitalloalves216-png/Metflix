@@ -43,15 +43,22 @@ input {
 
 .player iframe {
   width: 100%;
-  height: 80%;
+  height: 75%;
   border: none;
 }
 
-.close {
+.controls {
+  display: flex;
+  justify-content: space-around;
   padding: 10px;
-  background: red;
-  text-align: center;
-  cursor: pointer;
+}
+
+.btn-player {
+  padding: 10px;
+  text-decoration: none;
+  color: white;
+  background: purple;
+  border-radius: 5px;
 }
 
 /* LISTA */
@@ -84,15 +91,13 @@ input {
 .btn {
   display: block;
   text-align: center;
-  padding: 5px;
-  margin: 3px;
+  padding: 8px;
+  margin: 5px;
   text-decoration: none;
   color: white;
+  background: green;
   cursor: pointer;
 }
-
-.play { background: green; }
-.rave { background: purple; }
 
 </style>
 </head>
@@ -106,8 +111,12 @@ input {
 
 <!-- PLAYER -->
 <div class="player" id="player">
-  <div class="close" onclick="fecharPlayer()">FECHAR</div>
-  <iframe id="videoFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  <iframe id="videoFrame"></iframe>
+
+  <div class="controls">
+    <a id="raveBtn" class="btn-player" target="_blank">📲 Assistir no Rave</a>
+    <div class="btn-player" onclick="fecharPlayer()">❌ Fechar</div>
+  </div>
 </div>
 
 <!-- FILMES -->
@@ -123,35 +132,34 @@ const filmes = [
     nome: "Olhos Famintos",
     img: "https://image.tmdb.org/t/p/original/4deKiUXWqyATIEKCBSjRxCOLvu0.jpg",
     video: "https://drive.google.com/file/d/13sgdCjcgbF_3EN0ldWBWNktgwTyZE_sX/preview",
-    rave: "https://drive.google.com/file/d/13sgdCjcgbF_3EN0ldWBWNktgwTyZE_sX/view"
+    rave: "https://drive.google.com/file/d/13sgdCjcgbF_3EN0ldWBWNktgwTyZE_sX/view?usp=sharing"
   }
 ];
 
+// CRIAR CARD
 function criarCard(f) {
   return `
   <div class="card">
     <img src="${f.img}">
     <h3>${f.nome}</h3>
     
-    <div class="btn play" onclick="abrirPlayer('${f.video}')">
+    <div class="btn" onclick="abrirPlayer('${f.video}', '${f.rave}')">
       ▶ Assistir
     </div>
-
-    <a class="btn rave" href="${f.rave}" target="_blank">
-      📲 Rave
-    </a>
   </div>
   `;
 }
 
+// RENDER
 function render(lista = filmes) {
   document.getElementById("filmes").innerHTML =
     lista.map(criarCard).join("");
 }
 
-function abrirPlayer(link) {
-  const frame = document.getElementById("videoFrame");
-  frame.src = link;
+// PLAYER
+function abrirPlayer(video, rave) {
+  document.getElementById("videoFrame").src = video;
+  document.getElementById("raveBtn").href = rave;
   document.getElementById("player").style.display = "flex";
 }
 
@@ -160,6 +168,7 @@ function fecharPlayer() {
   document.getElementById("videoFrame").src = "";
 }
 
+// BUSCA
 document.getElementById("search").addEventListener("input", function() {
   let valor = this.value.toLowerCase();
 
