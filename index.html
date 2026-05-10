@@ -35,30 +35,74 @@ input {
   left: 0;
   width: 100%;
   height: 100%;
-  background: black;
   display: none;
-  flex-direction: column;
   z-index: 999;
 }
 
-.player iframe {
+/* FUNDO BLUR */
+.bg-blur {
+  position: absolute;
   width: 100%;
-  height: 75%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px);
+  opacity: 0.3;
+}
+
+/* CONTEÚDO */
+.player-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  backdrop-filter: brightness(0.6);
+}
+
+/* TOPO */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  font-size: 18px;
+}
+
+/* FECHAR */
+.fechar {
+  font-size: 25px;
+  cursor: pointer;
+}
+
+/* VIDEO */
+.player iframe {
+  flex: 1;
+  width: 100%;
   border: none;
 }
 
+/* CONTROLES */
 .controls {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px;
+  padding: 15px;
+  text-align: center;
 }
 
-.btn-player {
-  padding: 10px;
+.controls a {
+  background: purple;
+  padding: 12px 25px;
+  border-radius: 6px;
   text-decoration: none;
   color: white;
-  background: purple;
-  border-radius: 5px;
+}
+
+/* ANIMAÇÃO */
+.player-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* LISTA */
@@ -98,7 +142,6 @@ input {
   background: green;
   cursor: pointer;
 }
-
 </style>
 </head>
 
@@ -111,11 +154,22 @@ input {
 
 <!-- PLAYER -->
 <div class="player" id="player">
-  <iframe id="videoFrame"></iframe>
 
-  <div class="controls">
-    <a id="raveBtn" class="btn-player" target="_blank">📲 Assistir no Rave</a>
-    <div class="btn-player" onclick="fecharPlayer()">❌ Fechar</div>
+  <div class="bg-blur" id="bgBlur"></div>
+
+  <div class="player-content">
+
+    <div class="topbar">
+      <span id="tituloFilme"></span>
+      <div class="fechar" onclick="fecharPlayer()">✕</div>
+    </div>
+
+    <iframe id="videoFrame" allowfullscreen></iframe>
+
+    <div class="controls">
+      <a id="raveBtn" target="_blank">📲 Assistir no Rave</a>
+    </div>
+
   </div>
 </div>
 
@@ -143,7 +197,7 @@ function criarCard(f) {
     <img src="${f.img}">
     <h3>${f.nome}</h3>
     
-    <div class="btn" onclick="abrirPlayer('${f.video}', '${f.rave}')">
+    <div class="btn" onclick="abrirPlayer('${f.video}', '${f.rave}', '${f.nome}', '${f.img}')">
       ▶ Assistir
     </div>
   </div>
@@ -157,10 +211,13 @@ function render(lista = filmes) {
 }
 
 // PLAYER
-function abrirPlayer(video, rave) {
+function abrirPlayer(video, rave, nome, img) {
   document.getElementById("videoFrame").src = video;
   document.getElementById("raveBtn").href = rave;
-  document.getElementById("player").style.display = "flex";
+  document.getElementById("tituloFilme").innerText = nome;
+  document.getElementById("bgBlur").style.backgroundImage = `url(${img})`;
+
+  document.getElementById("player").style.display = "block";
 }
 
 function fecharPlayer() {
