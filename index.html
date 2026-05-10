@@ -28,7 +28,7 @@ input {
   border: none;
 }
 
-/* PLAYER */
+/* PLAYER / DETALHES */
 .player {
   position: fixed;
   top: 0;
@@ -55,6 +55,7 @@ input {
   display: flex;
   flex-direction: column;
   height: 100%;
+  backdrop-filter: brightness(0.6);
 }
 
 .topbar {
@@ -75,32 +76,6 @@ input {
   border: none;
 }
 
-/* BOTÃO RAVE BONITO */
-.rave-container {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-}
-
-.rave {
-  background: rgba(0,0,0,0.7);
-  border: none;
-  padding: 10px 15px;
-  border-radius: 20px;
-  color: white;
-  font-size: 13px;
-  backdrop-filter: blur(10px);
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  transition: 0.3s;
-  text-decoration: none;
-}
-
-.rave:hover {
-  background: #e50914;
-}
-
 /* BOTÕES */
 .btn {
   display: block;
@@ -116,6 +91,11 @@ input {
   background: #e50914;
 }
 
+.rave {
+  background: black;
+  border: 1px solid #e50914;
+}
+
 /* LISTA */
 .section { padding: 10px; }
 
@@ -125,7 +105,7 @@ input {
   gap: 10px;
 }
 
-/* CARD */
+/* CARD NOVO */
 .card {
   min-width: 170px;
   background: #1c1c1c;
@@ -183,33 +163,36 @@ input {
 
     <iframe id="videoFrame" allowfullscreen></iframe>
 
-    <!-- BOTÃO RAVE NOVO -->
-    <div class="rave-container">
-      <a id="raveBtn" class="rave" target="_blank">👥 Assistir junto</a>
+    <div style="text-align:center; padding:10px;">
+      <a id="raveBtn" class="btn rave" target="_blank">📲 Assistir no Rave</a>
     </div>
-
   </div>
 </div>
 
 <!-- DETALHES -->
 <div class="player" id="detalhes">
+
   <div class="bg-blur" id="bgDetalhes"></div>
 
   <div class="player-content">
+
     <div class="topbar">
       <span id="tituloDetalhes"></span>
       <div class="fechar" onclick="fecharDetalhes()">✕</div>
     </div>
 
     <div style="padding: 20px; text-align:center;">
+      
       <div class="btn assistir" onclick="assistirAgora()">▶ Assistir aqui</div>
       
       <a id="raveDetalhes" class="btn rave" target="_blank">
-        👥 Rave
+        📲 Assistir no Rave
       </a>
 
       <p id="sinopseDetalhes" style="margin-top:20px; color:#ccc;"></p>
+
     </div>
+
   </div>
 </div>
 
@@ -239,6 +222,7 @@ function criarCard(f, i) {
   return `
   <div class="card">
     <img src="${f.img}">
+
     <div class="info">
       <h3>${f.nome}</h3>
       <p class="sinopse">${f.sinopse}</p>
@@ -267,7 +251,7 @@ function abrirDetalhes(index) {
   document.getElementById("tituloDetalhes").innerText = f.nome;
   document.getElementById("sinopseDetalhes").innerText = f.sinopse;
   document.getElementById("raveDetalhes").href = f.rave;
-  document.getElementById("bgDetalhes").style.backgroundImage = `url(${f.img})";
+  document.getElementById("bgDetalhes").style.backgroundImage = `url(${f.img})`;
 
   document.getElementById("detalhes").style.display = "block";
 }
