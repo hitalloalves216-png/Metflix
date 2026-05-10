@@ -39,7 +39,6 @@ input {
   z-index: 999;
 }
 
-/* FUNDO BLUR */
 .bg-blur {
   position: absolute;
   width: 100%;
@@ -50,7 +49,6 @@ input {
   opacity: 0.3;
 }
 
-/* CONTEÚDO */
 .player-content {
   position: relative;
   z-index: 2;
@@ -60,7 +58,6 @@ input {
   backdrop-filter: brightness(0.6);
 }
 
-/* TOPO */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -68,41 +65,29 @@ input {
   font-size: 18px;
 }
 
-/* FECHAR */
 .fechar {
   font-size: 25px;
   cursor: pointer;
 }
 
-/* VIDEO */
 .player iframe {
   flex: 1;
   width: 100%;
   border: none;
 }
 
-/* CONTROLES */
 .controls {
   padding: 15px;
   text-align: center;
 }
 
 .controls a {
-  background: purple;
+  background: black;
+  border: 1px solid #e50914;
   padding: 12px 25px;
   border-radius: 6px;
   text-decoration: none;
   color: white;
-}
-
-/* ANIMAÇÃO */
-.player-content {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
 }
 
 /* LISTA */
@@ -115,10 +100,15 @@ input {
 }
 
 .card {
-  min-width: 140px;
-  background: #222;
+  min-width: 160px;
+  background: #1c1c1c;
   border-radius: 10px;
   overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
 }
 
 .card img {
@@ -135,12 +125,36 @@ input {
 .btn {
   display: block;
   text-align: center;
-  padding: 8px;
+  padding: 10px;
   margin: 5px;
   text-decoration: none;
   color: white;
-  background: green;
   cursor: pointer;
+}
+
+.assistir {
+  background: #e50914;
+}
+
+.rave {
+  background: black;
+  border: 1px solid #e50914;
+}
+
+.sinopse {
+  font-size: 12px;
+  padding: 5px 8px;
+  color: #bbb;
+}
+
+/* ANIMAÇÃO */
+.player-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 </style>
 </head>
@@ -154,11 +168,9 @@ input {
 
 <!-- PLAYER -->
 <div class="player" id="player">
-
   <div class="bg-blur" id="bgBlur"></div>
 
   <div class="player-content">
-
     <div class="topbar">
       <span id="tituloFilme"></span>
       <div class="fechar" onclick="fecharPlayer()">✕</div>
@@ -168,6 +180,32 @@ input {
 
     <div class="controls">
       <a id="raveBtn" target="_blank">📲 Assistir no Rave</a>
+    </div>
+  </div>
+</div>
+
+<!-- DETALHES -->
+<div class="player" id="detalhes">
+
+  <div class="bg-blur" id="bgDetalhes"></div>
+
+  <div class="player-content">
+
+    <div class="topbar">
+      <span id="tituloDetalhes"></span>
+      <div class="fechar" onclick="fecharDetalhes()">✕</div>
+    </div>
+
+    <div style="padding: 20px; text-align:center;">
+      
+      <div class="btn assistir" onclick="assistirAgora()">▶ Assistir aqui</div>
+      
+      <a id="raveDetalhes" class="btn rave" target="_blank">
+        📲 Assistir no Rave
+      </a>
+
+      <p id="sinopseDetalhes" style="margin-top:20px; color:#ccc;"></p>
+
     </div>
 
   </div>
@@ -185,60 +223,28 @@ const filmes = [
   {
     nome: "Olhos Famintos",
     img: "https://image.tmdb.org/t/p/original/4deKiUXWqyATIEKCBSjRxCOLvu0.jpg",
+    sinopse: "Uma criatura misteriosa desperta a cada 23 anos para se alimentar de humanos.",
     video: "https://drive.google.com/file/d/13sgdCjcgbF_3EN0ldWBWNktgwTyZE_sX/preview",
     rave: "https://drive.google.com/file/d/13sgdCjcgbF_3EN0ldWBWNktgwTyZE_sX/view?usp=sharing"
   }
 ];
 
-// CRIAR CARD
+// VARIÁVEIS
+let videoAtual = "";
+let raveAtual = "";
+
+// CARD
 function criarCard(f) {
   return `
   <div class="card">
     <img src="${f.img}">
     <h3>${f.nome}</h3>
-    
-    <div class="btn" onclick="abrirPlayer('${f.video}', '${f.rave}', '${f.nome}', '${f.img}')">
+
+    <div class="btn assistir" onclick="abrirDetalhes('${f.video}', '${f.rave}', '${f.nome}', '${f.img}', '${f.sinopse}')">
       ▶ Assistir
     </div>
   </div>
   `;
 }
 
-// RENDER
-function render(lista = filmes) {
-  document.getElementById("filmes").innerHTML =
-    lista.map(criarCard).join("");
-}
-
-// PLAYER
-function abrirPlayer(video, rave, nome, img) {
-  document.getElementById("videoFrame").src = video;
-  document.getElementById("raveBtn").href = rave;
-  document.getElementById("tituloFilme").innerText = nome;
-  document.getElementById("bgBlur").style.backgroundImage = `url(${img})`;
-
-  document.getElementById("player").style.display = "block";
-}
-
-function fecharPlayer() {
-  document.getElementById("player").style.display = "none";
-  document.getElementById("videoFrame").src = "";
-}
-
-// BUSCA
-document.getElementById("search").addEventListener("input", function() {
-  let valor = this.value.toLowerCase();
-
-  let filtrados = filmes.filter(f =>
-    f.nome.toLowerCase().includes(valor)
-  );
-
-  render(filtrados);
-});
-
-render();
-
-</script>
-
-</body>
-</html>
+// R
