@@ -28,7 +28,7 @@ input {
   border: none;
 }
 
-/* PLAYER */
+/* PLAYER / DETALHES */
 .player {
   position: fixed;
   top: 0;
@@ -76,52 +76,7 @@ input {
   border: none;
 }
 
-.controls {
-  padding: 15px;
-  text-align: center;
-}
-
-.controls a {
-  background: black;
-  border: 1px solid #e50914;
-  padding: 12px 25px;
-  border-radius: 6px;
-  text-decoration: none;
-  color: white;
-}
-
-/* LISTA */
-.section { padding: 10px; }
-
-.row {
-  display: flex;
-  overflow-x: auto;
-  gap: 10px;
-}
-
-.card {
-  min-width: 160px;
-  background: #1c1c1c;
-  border-radius: 10px;
-  overflow: hidden;
-  transition: transform 0.3s;
-}
-
-.card:hover {
-  transform: scale(1.05);
-}
-
-.card img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.card h3 {
-  font-size: 13px;
-  padding: 5px;
-}
-
+/* BOTÕES */
 .btn {
   display: block;
   text-align: center;
@@ -141,20 +96,50 @@ input {
   border: 1px solid #e50914;
 }
 
+/* LISTA */
+.section { padding: 10px; }
+
+.row {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+}
+
+/* CARD NOVO */
+.card {
+  min-width: 170px;
+  background: #1c1c1c;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.info {
+  padding: 8px;
+}
+
+.info h3 {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
 .sinopse {
-  font-size: 12px;
-  padding: 5px 8px;
+  font-size: 11px;
   color: #bbb;
-}
-
-/* ANIMAÇÃO */
-.player-content {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  height: 50px;
+  overflow: hidden;
 }
 </style>
 </head>
@@ -178,8 +163,8 @@ input {
 
     <iframe id="videoFrame" allowfullscreen></iframe>
 
-    <div class="controls">
-      <a id="raveBtn" target="_blank">📲 Assistir no Rave</a>
+    <div style="text-align:center; padding:10px;">
+      <a id="raveBtn" class="btn rave" target="_blank">📲 Assistir no Rave</a>
     </div>
   </div>
 </div>
@@ -229,22 +214,83 @@ const filmes = [
   }
 ];
 
-// VARIÁVEIS
 let videoAtual = "";
 let raveAtual = "";
 
-// CARD
-function criarCard(f) {
+/* CARD */
+function criarCard(f, i) {
   return `
   <div class="card">
     <img src="${f.img}">
-    <h3>${f.nome}</h3>
 
-    <div class="btn assistir" onclick="abrirDetalhes('${f.video}', '${f.rave}', '${f.nome}', '${f.img}', '${f.sinopse}')">
-      ▶ Assistir
+    <div class="info">
+      <h3>${f.nome}</h3>
+      <p class="sinopse">${f.sinopse}</p>
+
+      <div class="btn assistir" onclick="abrirDetalhes(${i})">
+        ▶ Assistir
+      </div>
     </div>
   </div>
   `;
 }
 
-// R
+/* RENDER */
+function render(lista = filmes) {
+  document.getElementById("filmes").innerHTML =
+    lista.map((f, i) => criarCard(f, i)).join("");
+}
+
+/* DETALHES */
+function abrirDetalhes(index) {
+  const f = filmes[index];
+
+  videoAtual = f.video;
+  raveAtual = f.rave;
+
+  document.getElementById("tituloDetalhes").innerText = f.nome;
+  document.getElementById("sinopseDetalhes").innerText = f.sinopse;
+  document.getElementById("raveDetalhes").href = f.rave;
+  document.getElementById("bgDetalhes").style.backgroundImage = `url(${f.img})`;
+
+  document.getElementById("detalhes").style.display = "block";
+}
+
+function fecharDetalhes() {
+  document.getElementById("detalhes").style.display = "none";
+}
+
+/* PLAYER */
+function assistirAgora() {
+  fecharDetalhes();
+  abrirPlayer(videoAtual, raveAtual);
+}
+
+function abrirPlayer(video, rave) {
+  document.getElementById("videoFrame").src = video;
+  document.getElementById("raveBtn").href = rave;
+  document.getElementById("player").style.display = "block";
+}
+
+function fecharPlayer() {
+  document.getElementById("player").style.display = "none";
+  document.getElementById("videoFrame").src = "";
+}
+
+/* BUSCA */
+document.getElementById("search").addEventListener("input", function() {
+  let valor = this.value.toLowerCase();
+
+  let filtrados = filmes.filter(f =>
+    f.nome.toLowerCase().includes(valor)
+  );
+
+  render(filtrados);
+});
+
+render();
+
+</script>
+
+</body>
+</html>
