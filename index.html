@@ -13,87 +13,112 @@ body {
   color: white;
 }
 
+/* HEADER */
 header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 15px;
   background: black;
 }
 
 header h1 { color: red; }
 
+/* BUSCA MODERNA */
 input {
-  padding: 8px;
-  border-radius: 5px;
+  padding: 6px 10px;
+  border-radius: 20px;
   border: none;
+  width: 140px;
+  background: #222;
+  color: white;
+  outline: none;
+  transition: 0.3s;
 }
 
-/* PLAYER / DETALHES */
+input:focus {
+  width: 180px;
+  background: #333;
+}
+
+input::placeholder {
+  color: #888;
+}
+
+/* PLAYER */
 .player {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: black;
   display: none;
   z-index: 999;
 }
 
-.bg-blur {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  filter: blur(20px);
-  opacity: 0.3;
-}
-
-.player-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  backdrop-filter: brightness(0.6);
-}
-
 .topbar {
   display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  font-size: 18px;
+  justify-content: flex-end;
+  padding: 10px;
 }
 
 .fechar {
-  font-size: 25px;
+  font-size: 28px;
   cursor: pointer;
 }
 
-.player iframe {
-  flex: 1;
+/* VIDEO */
+video {
   width: 100%;
-  border: none;
+  height: 75%;
+  background: black;
 }
 
-/* BOTÕES */
-.btn {
-  display: block;
-  text-align: center;
+/* CONTROLES */
+.controls {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
   padding: 10px;
-  margin: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.controls input {
+  flex: 1;
+}
+
+#tempo {
+  font-size: 12px;
+  color: #ccc;
+}
+
+/* RAVE */
+.rave {
+  position: absolute;
+  bottom: 60px;
+  right: 20px;
+  background: rgba(0,0,0,0.7);
+  padding: 8px 12px;
+  border-radius: 20px;
   text-decoration: none;
   color: white;
-  cursor: pointer;
+  font-size: 13px;
 }
 
-.assistir {
-  background: #e50914;
-}
-
-.rave {
-  background: black;
-  border: 1px solid #e50914;
+.rave:hover {
+  background: red;
 }
 
 /* LISTA */
@@ -105,15 +130,13 @@ input {
   gap: 10px;
 }
 
-/* CARD NOVO */
+/* CARD */
 .card {
   min-width: 170px;
   background: #1c1c1c;
   border-radius: 10px;
   overflow: hidden;
   transition: transform 0.3s;
-  display: flex;
-  flex-direction: column;
 }
 
 .card:hover {
@@ -126,20 +149,21 @@ input {
   object-fit: cover;
 }
 
-.info {
-  padding: 8px;
-}
-
-.info h3 {
-  font-size: 14px;
-  margin: 5px 0;
-}
+.info { padding: 8px; }
 
 .sinopse {
   font-size: 11px;
   color: #bbb;
   height: 50px;
   overflow: hidden;
+}
+
+.btn {
+  text-align: center;
+  padding: 8px;
+  background: #e50914;
+  margin-top: 5px;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -153,46 +177,19 @@ input {
 
 <!-- PLAYER -->
 <div class="player" id="player">
-  <div class="bg-blur" id="bgBlur"></div>
-
-  <div class="player-content">
-    <div class="topbar">
-      <span id="tituloFilme"></span>
-      <div class="fechar" onclick="fecharPlayer()">✕</div>
-    </div>
-
-    <iframe id="videoFrame" allowfullscreen></iframe>
-
-    <div style="text-align:center; padding:10px;">
-      <a id="raveBtn" class="btn rave" target="_blank">📲 Assistir no Rave</a>
-    </div>
+  <div class="topbar">
+    <div class="fechar" onclick="fecharPlayer()">✕</div>
   </div>
-</div>
 
-<!-- DETALHES -->
-<div class="player" id="detalhes">
+  <video id="videoFrame"></video>
 
-  <div class="bg-blur" id="bgDetalhes"></div>
+  <a id="raveBtn" class="rave" target="_blank">📲 Rave</a>
 
-  <div class="player-content">
-
-    <div class="topbar">
-      <span id="tituloDetalhes"></span>
-      <div class="fechar" onclick="fecharDetalhes()">✕</div>
-    </div>
-
-    <div style="padding: 20px; text-align:center;">
-      
-      <div class="btn assistir" onclick="assistirAgora()">▶ Assistir aqui</div>
-      
-      <a id="raveDetalhes" class="btn rave" target="_blank">
-        📲 Assistir no Rave
-      </a>
-
-      <p id="sinopseDetalhes" style="margin-top:20px; color:#ccc;"></p>
-
-    </div>
-
+  <div class="controls">
+    <button onclick="togglePlay()">▶️</button>
+    <input type="range" id="progress" value="0">
+    <span id="tempo">0:00 / 0:00</span>
+    <button onclick="fullscreen()">⛶</button>
   </div>
 </div>
 
@@ -208,26 +205,71 @@ const filmes = [
   {
     nome: "Olhos Famintos",
     img: "https://image.tmdb.org/t/p/original/4deKiUXWqyATIEKCBSjRxCOLvu0.jpg",
-    sinopse: "Uma criatura misteriosa desperta a cada 23 anos para se alimentar de humanos.",
-    video: "https://drive.google.com/file/d/13sgdCjcgbF_3EN0ldWBWNktgwTyZE_sX/preview",
-    rave: "https://drive.google.com/file/d/13sgdCjcgbF_3EN0ldWBWNktgwTyZE_sX/view?usp=sharing"
+    sinopse: "Criatura misteriosa que aparece a cada 23 anos.",
+    video: "https://drive.google.com/file/d/ID/review",
+    rave: "https://drive.google.com/file/d/ID/view"
   }
 ];
 
-let videoAtual = "";
-let raveAtual = "";
+const video = document.getElementById("videoFrame");
+const progress = document.getElementById("progress");
+const tempo = document.getElementById("tempo");
 
-/* CARD */
-function criarCard(f, i) {
+/* PLAYER */
+function abrirPlayer(filme) {
+  video.src = filme.video;
+  video.play();
+
+  document.getElementById("raveBtn").href = filme.rave;
+  document.getElementById("player").style.display = "block";
+}
+
+function fecharPlayer() {
+  video.pause();
+  video.src = "";
+  document.getElementById("player").style.display = "none";
+}
+
+/* CONTROLES */
+function togglePlay() {
+  if (video.paused) video.play();
+  else video.pause();
+}
+
+video.addEventListener("timeupdate", () => {
+  progress.value = (video.currentTime / video.duration) * 100;
+
+  let atual = formatar(video.currentTime);
+  let total = formatar(video.duration);
+
+  tempo.innerText = `${atual} / ${total}`;
+});
+
+progress.addEventListener("input", () => {
+  video.currentTime = (progress.value / 100) * video.duration;
+});
+
+function fullscreen() {
+  video.requestFullscreen();
+}
+
+function formatar(s) {
+  if (!s) return "0:00";
+  let min = Math.floor(s / 60);
+  let seg = Math.floor(s % 60);
+  if (seg < 10) seg = "0" + seg;
+  return `${min}:${seg}`;
+}
+
+/* CARDS */
+function criarCard(f) {
   return `
   <div class="card">
     <img src="${f.img}">
-
     <div class="info">
       <h3>${f.nome}</h3>
       <p class="sinopse">${f.sinopse}</p>
-
-      <div class="btn assistir" onclick="abrirDetalhes(${i})">
+      <div class="btn" onclick='abrirPlayer(${JSON.stringify(f)})'>
         ▶ Assistir
       </div>
     </div>
@@ -235,46 +277,9 @@ function criarCard(f, i) {
   `;
 }
 
-/* RENDER */
 function render(lista = filmes) {
   document.getElementById("filmes").innerHTML =
-    lista.map((f, i) => criarCard(f, i)).join("");
-}
-
-/* DETALHES */
-function abrirDetalhes(index) {
-  const f = filmes[index];
-
-  videoAtual = f.video;
-  raveAtual = f.rave;
-
-  document.getElementById("tituloDetalhes").innerText = f.nome;
-  document.getElementById("sinopseDetalhes").innerText = f.sinopse;
-  document.getElementById("raveDetalhes").href = f.rave;
-  document.getElementById("bgDetalhes").style.backgroundImage = `url(${f.img})`;
-
-  document.getElementById("detalhes").style.display = "block";
-}
-
-function fecharDetalhes() {
-  document.getElementById("detalhes").style.display = "none";
-}
-
-/* PLAYER */
-function assistirAgora() {
-  fecharDetalhes();
-  abrirPlayer(videoAtual, raveAtual);
-}
-
-function abrirPlayer(video, rave) {
-  document.getElementById("videoFrame").src = video;
-  document.getElementById("raveBtn").href = rave;
-  document.getElementById("player").style.display = "block";
-}
-
-function fecharPlayer() {
-  document.getElementById("player").style.display = "none";
-  document.getElementById("videoFrame").src = "";
+    lista.map(criarCard).join("");
 }
 
 /* BUSCA */
