@@ -65,48 +65,14 @@ input {
   cursor: pointer;
 }
 
-/* VIDEO */
-.video-container {
-  position: relative;
+/* VIDEO ANTIGO */
+.player iframe {
   width: 100%;
-  height: 100%;
-}
-
-video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: black;
-}
-
-/* CONTROLES */
-.controls {
-  position: absolute;
-  bottom: 40px;
-  left: 10px;
-  right: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.controls button {
-  background: none;
+  height: 90%;
   border: none;
-  color: white;
-  font-size: 22px;
-  cursor: pointer;
 }
 
-/* PROGRESSO */
-#progress {
-  position: absolute;
-  bottom: 10px;
-  width: 95%;
-  left: 2.5%;
-}
-
-/* DETALHES (ANIMAÇÃO) */
+/* DETALHES ANIMAÇÃO */
 #detalhes {
   animation: fadeZoom 0.3s ease;
 }
@@ -175,23 +141,14 @@ video {
   <input id="search" placeholder="Buscar...">
 </header>
 
-<!-- PLAYER -->
+<!-- PLAYER (ANTIGO) -->
 <div class="player" id="player">
   <div class="player-content">
     <div class="topbar">
       <div class="fechar" onclick="fecharPlayer()">✕</div>
     </div>
 
-    <div class="video-container">
-      <video id="videoPlayer"></video>
-
-      <div class="controls">
-        <button onclick="togglePlay()">⏯</button>
-        <span id="tempo">0:00 / 0:00</span>
-      </div>
-
-      <input type="range" id="progress" value="0">
-    </div>
+    <iframe id="videoFrame" allowfullscreen></iframe>
   </div>
 </div>
 
@@ -231,6 +188,7 @@ const filmes = [
 
 let videoAtual = "";
 
+/* CARD */
 function criarCard(f, i) {
   return `
   <div class="card">
@@ -243,11 +201,13 @@ function criarCard(f, i) {
   `;
 }
 
+/* RENDER */
 function render(lista = filmes) {
   document.getElementById("filmes").innerHTML =
     lista.map((f, i) => criarCard(f, i)).join("");
 }
 
+/* DETALHES */
 function abrirDetalhes(index) {
   const f = filmes[index];
   videoAtual = f.video;
@@ -260,47 +220,21 @@ function fecharDetalhes() {
   document.getElementById("detalhes").style.display = "none";
 }
 
+/* PLAYER */
 function assistirAgora() {
   fecharDetalhes();
   abrirPlayer(videoAtual);
 }
 
-/* PLAYER */
-const video = document.getElementById("videoPlayer");
-const progress = document.getElementById("progress");
-const tempo = document.getElementById("tempo");
-
-function abrirPlayer(src) {
-  video.src = src;
+function abrirPlayer(video) {
+  document.getElementById("videoFrame").src = video;
   document.getElementById("player").style.display = "block";
-  video.play();
 }
 
 function fecharPlayer() {
   document.getElementById("player").style.display = "none";
-  video.pause();
-  video.src = "";
+  document.getElementById("videoFrame").src = "";
 }
-
-function togglePlay() {
-  video.paused ? video.play() : video.pause();
-}
-
-video.addEventListener("timeupdate", () => {
-  progress.value = (video.currentTime / video.duration) * 100 || 0;
-
-  let m1 = Math.floor(video.currentTime / 60);
-  let s1 = Math.floor(video.currentTime % 60);
-  let m2 = Math.floor(video.duration / 60) || 0;
-  let s2 = Math.floor(video.duration % 60) || 0;
-
-  tempo.innerText =
-    `${m1}:${s1.toString().padStart(2,"0")} / ${m2}:${s2.toString().padStart(2,"0")}`;
-});
-
-progress.addEventListener("input", () => {
-  video.currentTime = (progress.value / 100) * video.duration;
-});
 
 /* BUSCA */
 document.getElementById("search").addEventListener("input", function() {
