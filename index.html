@@ -13,6 +13,7 @@ body {
   color: white;
 }
 
+/* HEADER */
 header {
   display: flex;
   justify-content: space-between;
@@ -46,25 +47,13 @@ input {
   background: black;
 }
 
-.bg-blur {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  filter: blur(20px);
-  opacity: 0.3;
-}
-
 .player-content {
-  position: relative;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-/* TOPO LIMPO */
+/* TOPO */
 .topbar {
   display: flex;
   justify-content: flex-end;
@@ -76,31 +65,70 @@ input {
   cursor: pointer;
 }
 
-/* VIDEO LIMPO */
-.player iframe {
+/* VIDEO */
+.video-container {
+  position: relative;
   width: 100%;
-  height: 90%;
-  border: none;
+  height: 100%;
 }
 
-/* BOTÕES */
-.btn {
-  display: block;
-  text-align: center;
-  padding: 10px;
-  margin: 5px;
-  text-decoration: none;
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: black;
+}
+
+/* CONTROLES */
+.controls {
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls button {
+  background: none;
+  border: none;
   color: white;
+  font-size: 22px;
   cursor: pointer;
 }
 
-.assistir {
-  background: #e50914;
+/* PROGRESSO */
+#progress {
+  position: absolute;
+  bottom: 10px;
+  width: 95%;
+  left: 2.5%;
 }
 
-.rave {
-  background: black;
-  border: 1px solid #e50914;
+/* DETALHES (ANIMAÇÃO) */
+#detalhes {
+  animation: fadeZoom 0.3s ease;
+}
+
+@keyframes fadeZoom {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* BOTÃO */
+.btn {
+  padding: 12px;
+  background: #e50914;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 /* LISTA */
@@ -112,15 +140,12 @@ input {
   gap: 10px;
 }
 
-/* CARD */
 .card {
   min-width: 170px;
   background: #1c1c1c;
   border-radius: 10px;
   overflow: hidden;
-  transition: transform 0.3s;
-  display: flex;
-  flex-direction: column;
+  transition: 0.3s;
 }
 
 .card:hover {
@@ -139,14 +164,6 @@ input {
 
 .info h3 {
   font-size: 14px;
-  margin: 5px 0;
-}
-
-.sinopse {
-  font-size: 11px;
-  color: #bbb;
-  height: 50px;
-  overflow: hidden;
 }
 </style>
 </head>
@@ -160,41 +177,39 @@ input {
 
 <!-- PLAYER -->
 <div class="player" id="player">
-  <div class="bg-blur" id="bgBlur"></div>
-
   <div class="player-content">
     <div class="topbar">
       <div class="fechar" onclick="fecharPlayer()">✕</div>
     </div>
 
-    <iframe id="videoFrame" allowfullscreen></iframe>
+    <div class="video-container">
+      <video id="videoPlayer"></video>
+
+      <div class="controls">
+        <button onclick="togglePlay()">⏯</button>
+        <span id="tempo">0:00 / 0:00</span>
+      </div>
+
+      <input type="range" id="progress" value="0">
+    </div>
   </div>
 </div>
 
 <!-- DETALHES -->
 <div class="player" id="detalhes">
-
-  <div class="bg-blur" id="bgDetalhes"></div>
-
   <div class="player-content">
-
     <div class="topbar">
       <span id="tituloDetalhes"></span>
       <div class="fechar" onclick="fecharDetalhes()">✕</div>
     </div>
 
-    <div style="padding: 20px; text-align:center;">
-      
-      <div class="btn assistir" onclick="assistirAgora()">▶ Assistir aqui</div>
-      
-      <a id="raveDetalhes" class="btn rave" target="_blank">
-        📲 Rave
-      </a>
+    <div style="padding:20px; text-align:center;">
+      <div class="btn" onclick="assistirAgora()">▶ Assistir</div>
 
-      <p id="sinopseDetalhes" style="margin-top:20px; color:#ccc;"></p>
-
+      <p style="margin-top:20px; color:#ccc;">
+        Se quiser assistir junto com alguém, baixe o aplicativo <b>fofuxin</b> 📲
+      </p>
     </div>
-
   </div>
 </div>
 
@@ -210,50 +225,34 @@ const filmes = [
   {
     nome: "Olhos Famintos",
     img: "https://image.tmdb.org/t/p/original/4deKiUXWqyATIEKCBSjRxCOLvu0.jpg",
-    sinopse: "Uma criatura misteriosa desperta a cada 23 anos para se alimentar de humanos.",
-    video: "https://archive.org/download/olhos-famintos.mp4/Olhos%20Famintos.mp4",
-    rave: "https://archive.org/download/olhos-famintos.mp4/Olhos%20Famintos.mp4"
+    video: "https://archive.org/download/olhos-famintos.mp4/Olhos%20Famintos.mp4"
   }
 ];
 
 let videoAtual = "";
-let raveAtual = "";
 
-/* CARD */
 function criarCard(f, i) {
   return `
   <div class="card">
     <img src="${f.img}">
     <div class="info">
       <h3>${f.nome}</h3>
-      <p class="sinopse">${f.sinopse}</p>
-
-      <div class="btn assistir" onclick="abrirDetalhes(${i})">
-        ▶ Assistir
-      </div>
+      <div class="btn" onclick="abrirDetalhes(${i})">▶ Assistir</div>
     </div>
   </div>
   `;
 }
 
-/* RENDER */
 function render(lista = filmes) {
   document.getElementById("filmes").innerHTML =
     lista.map((f, i) => criarCard(f, i)).join("");
 }
 
-/* DETALHES */
 function abrirDetalhes(index) {
   const f = filmes[index];
-
   videoAtual = f.video;
-  raveAtual = f.rave;
 
   document.getElementById("tituloDetalhes").innerText = f.nome;
-  document.getElementById("sinopseDetalhes").innerText = f.sinopse;
-  document.getElementById("raveDetalhes").href = f.rave;
-  document.getElementById("bgDetalhes").style.backgroundImage = `url(${f.img})`;
-
   document.getElementById("detalhes").style.display = "block";
 }
 
@@ -261,21 +260,47 @@ function fecharDetalhes() {
   document.getElementById("detalhes").style.display = "none";
 }
 
-/* PLAYER */
 function assistirAgora() {
   fecharDetalhes();
   abrirPlayer(videoAtual);
 }
 
-function abrirPlayer(video) {
-  document.getElementById("videoFrame").src = video;
+/* PLAYER */
+const video = document.getElementById("videoPlayer");
+const progress = document.getElementById("progress");
+const tempo = document.getElementById("tempo");
+
+function abrirPlayer(src) {
+  video.src = src;
   document.getElementById("player").style.display = "block";
+  video.play();
 }
 
 function fecharPlayer() {
   document.getElementById("player").style.display = "none";
-  document.getElementById("videoFrame").src = "";
+  video.pause();
+  video.src = "";
 }
+
+function togglePlay() {
+  video.paused ? video.play() : video.pause();
+}
+
+video.addEventListener("timeupdate", () => {
+  progress.value = (video.currentTime / video.duration) * 100 || 0;
+
+  let m1 = Math.floor(video.currentTime / 60);
+  let s1 = Math.floor(video.currentTime % 60);
+  let m2 = Math.floor(video.duration / 60) || 0;
+  let s2 = Math.floor(video.duration % 60) || 0;
+
+  tempo.innerText =
+    `${m1}:${s1.toString().padStart(2,"0")} / ${m2}:${s2.toString().padStart(2,"0")}`;
+});
+
+progress.addEventListener("input", () => {
+  video.currentTime = (progress.value / 100) * video.duration;
+});
 
 /* BUSCA */
 document.getElementById("search").addEventListener("input", function() {
